@@ -1,4 +1,4 @@
-name: CI for Restaurant Service
+name: CI for Delivery Service 
 
 on:
   push:
@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the current repository (Restaurant service code)
+      # Step 1: Checkout main repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # (Optional) Step 2: Clone Kubernetes Config Repository
+      # Step 2: Clone Kubernetes config repo (optional)
       - name: Clone Kubernetes Config Repository
         uses: actions/checkout@v3
         with:
@@ -23,14 +23,18 @@ jobs:
           ref: main
           path: kubernetes
 
-      # Step 3: Log in to Docker Hub
+      # Step 3: Login to Docker Hub
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # Step 4: Build the Docker image
+      # ✅ Step 4: Build Docker image (FIXED PATH)
       - name: Build Docker image
-        run: docker build -f Dockerfile -t vidura12/deliveroo:delivery-service-latest .
+        run: |
+          docker build \
+          -f delivery-service/backend/Dockerfile \
+          -t vidura12/deliveroo:delivery-service-latest \
+          delivery-service/backend
 
-      # Step 5: Push the Docker image to Docker Hub
-      - name: Push Docker image to Docker Hub
+      # Step 5: Push Docker image
+      - name: Push Docker image
         run: docker push vidura12/deliveroo:delivery-service-latest
