@@ -12,18 +12,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Health check (VERY IMPORTANT for Railway)
+// ✅ Health check (needed for Railway)
 app.get("/api/test", (req, res) => {
-  res.status(200).send("Backend is working");
+  res.send("OK");
 });
 
-// ✅ MongoDB Connection (safe)
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => {
-    console.error("❌ MongoDB Error:", err);
-  });
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error(err));
 
 // Routes
 app.use("/api/deliveries", deliveryRoutes);
@@ -34,15 +32,8 @@ app.get("/", (req, res) => {
   res.send("Delivery Management Service is running...");
 });
 
-// ✅ Global error handler (prevents crash → 502)
-app.use((err, req, res, next) => {
-  console.error("❌ Error:", err);
-  res.status(500).json({ error: err.message });
-});
-
-// ✅ IMPORTANT: Railway-compatible PORT binding
+// IMPORTANT FIX FOR RAILWAY
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
